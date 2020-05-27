@@ -4,8 +4,12 @@ const expressLayouts = require("express-ejs-layouts");
 const mongoose = require("mongoose");
 const flash = require("connect-flash");
 const session = require("express-session");
-
+const passport = require("passport");
 const app = express();
+
+//Passport config
+require("./config/passport")(passport);
+
 //Bodyparser
 app.use(express.urlencoded({ extended: false }));
 //Mongo Connection
@@ -45,15 +49,18 @@ app.use(
 		secret: "secret",
 		resave: true,
 		saveUninitialized: true,
-		cookie: { secure: true },
 	})
 );
+
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
 // connect flash
 app.use(flash());
 
-//Global variables 
-app.use( (req, res, next)=> {
+//Global variables
+app.use((req, res, next) => {
 	res.locals.success_msg = req.flash("success_msg");
 	res.locals.error_msg = req.flash("error_msg");
 	res.locals.error = req.flash("error");
